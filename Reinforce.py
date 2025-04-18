@@ -26,7 +26,8 @@ class REINFORCEAgentOptimized:
         Initialization Function 
 
         Parameters:
-        - 
+        - learning_rate (float): learning rate of the model
+        - gamma (float):
         """
         self.env = env
         self.gamma = gamma
@@ -36,7 +37,7 @@ class REINFORCEAgentOptimized:
         # Initialize policy: a table of action probabilities (softmax over actions)
         self.policy = np.ones((env.maze.shape[0] * env.maze.shape[1], env.action_space.n)) / env.action_space.n
         
-        # Baseline: we'll use a moving average of rewards as the baseline
+        # Baseline: use a moving average of rewards as the baseline
         self.baseline = 0
         
         # Heatmap tracking variables
@@ -44,17 +45,29 @@ class REINFORCEAgentOptimized:
         self.rewards = []  # Track cumulative rewards
 
     def to_state_index(self, position):
-        """Helper function to convert 2D position to 1D state index."""
+        """
+        Helper function to convert 2D position to 1D state index.
+
+        Params:
+            position (arr): vectore that tracks the current position of an agent in the maze
+        
+        """
         return position[0] * self.env.maze.shape[1] + position[1]
     
     def normalize_rewards(self, rewards):
-        """Normalize rewards to reduce the scale variability."""
+        """
+        Normalize rewards to reduce the scale variability.
+
+        Params:
+            rewards (int): number of rewards 
+        
+        """
         mean_reward = np.mean(rewards)
         std_reward = np.std(rewards) if np.std(rewards) > 0 else 1
         return (rewards - mean_reward) / std_reward
     
     def get_action(self, state_index, epsilon):
-        # Gradually decrease epsilon for exploration
+        # Gradually decrease epsilon for exploration with every action
         epsilon = max(0.1, epsilon * 0.85)  
         if np.random.rand() < epsilon:
             action = self.env.action_space.sample()  # Exploration
@@ -101,7 +114,8 @@ class REINFORCEAgentOptimized:
                 rewards.append(reward)
 
                 state = new_state
-                
+
+                # Add a reward
                 if done:
                     reward += 10
                     break
@@ -117,7 +131,7 @@ class REINFORCEAgentOptimized:
 
             # Apply reward scaling
             discounted_rewards = self.normalize_rewards(discounted_rewards) * 20  # Increase scaling factor to amplify reward effect
-            self.baseline = 0.9 * self.baseline + 0.1 * np.mean(discounted_rewards)  # Faster baseline adaptation
+            self.baseline = 0.9 * self.baseline + 0.1 * np.mean(discounted_rewards)  # Faster adaptation
             discounted_rewards = np.array(discounted_rewards) - self.baseline  
 
             # Track cumulative rewards for plotting
@@ -144,7 +158,7 @@ class REINFORCEAgentOptimized:
                 display_heatmap(episode + 1, self.episode_visit_counts, mode="R")  # Call display_heatmap from utils
                 print(f"Episode {episode+1}: Total Reward = {np.sum(rewards)}")
                 # Log or print policy for a specific state
-                print(f"Policy for state [0, 0]: {self.policy[self.to_state_index((0, 0)), :]}")  # Example
+                print(f"Policy for state [0, 0]: {self.policy[self.to_state_index((0, 0)), :]}")
 
         # After training, plot average cumulative rewards and learning stability
         plot_average_cumulative_rewards(self.rewards, mode="R")
