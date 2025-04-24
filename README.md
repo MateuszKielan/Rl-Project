@@ -4,7 +4,8 @@
 3. Q-learning.py - In this file, we define the logic behind Q-learning agent behaviour, contained in one class "QLearningAgentModified" and include the script for testing the agent in a given maze.
 4. Reinforce.py - In this file we define the logic behind Reinforce agent behaviour, contained in one class "REINFORCEAgentOptimized", definition of softmax function and include  the script for testing the agent in a given maze.
 5. maze_generator.py - In this file a randomised maze generator is implemented. Used for testing models generelizability with different maze layouts.
-   
+
+6. Report.pdf - contains description of the algorithms togeather with the results of running the simulation.
 
 
 
